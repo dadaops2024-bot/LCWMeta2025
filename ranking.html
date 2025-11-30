@@ -70,15 +70,11 @@ async function cargarDatos() {
           bodyFont: { size: 22 },
           titleFont: { size: 22 },
           callbacks: {
-            label: ctx => {
-              const d = data[ctx.dataIndex];
-              return [
-                `Ventas: $${d.ventas}`,
-                `Meta: $${d.meta}`,
-                `Alcance: ${d.porcentaje.toFixed(1)}%`
-              ];
-            }
-          }
+  label: ctx => {
+    const d = data[ctx.dataIndex];
+    return `${d.porcentaje.toFixed(1)}% de la meta`;
+  }
+}
         }
       },
 
