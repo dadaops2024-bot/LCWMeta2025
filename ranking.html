@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Ranking en Vivo – Metas Mensuales</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body {
+  font-family: Arial;
+  background: #f4f4f4;
+  padding: 20px;
+}
+.container {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+</style>
+
+<script>
+const API_URL = "YOUR_APPS_SCRIPT_URL";
+
+let chart;
+
+async function cargarDatos() {
+  const res = await fetch(API_URL + "?action=list");
+  const json = await res.json();
+
+  const data = json.data.map(item => ({
+    tienda: item.tienda,
+    meta: Number(item.meta),
+    ventas: Number(item.ventas),
+    porcentaje: (Number(item.ventas) / Number(item.meta)) * 100
+  }));
+
+  // ordenar por % meta alcanzada
+  data.sort((a, b) => b.porcentaje - a.porcentaje);
+
+  const labels = data.map(d => d.tienda);
+  const porcentaje = data.map(d => d.porcentaje.toFixed(1));
+  const colores = data.map(d => {
+    if (d.porcentaje >= 100) return "rgba(0,200,0,0.7)";
+    if (d.porcentaje >= 70) return "rgba(250,180,0,0.7)";
+    return "rgba(230,0,0,0.7)";
+  });
+
+  if (chart) chart.destroy();
+
+  chart = new Chart(document.getElementById("grafico"), {
+    type: "bar",
+    data: {
+      labels,
+      datasets: [{
+        label: "% Alcanzado",
+        data: porcentaje,
+        backgroundColor: colores
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      indexAxis: 'y',
+
+      plugins: {
+        legend: { display: false },
+
+        tooltip: {
+          bodyFont: { size: 22 },
+          titleFont: { size: 22 },
+          callbacks: {
+            label: ctx => {
+              const d = data[ctx.dataIndex];
+              return [
+                `Ventas: $${d.ventas}`,
+                `Meta: $${d.meta}`,
+                `Alcance: ${d.porcentaje.toFixed(1)}%`
+              ];
+            }
+          }
+        }
+      },
+
+      scales: {
+        x: {
+          beginAtZero: true,
+          max: 120,   // margen para tiendas top
+          ticks: { font: { size: 20 } }
+        },
+        y: {
+          ticks: { font: { size: 22 } }
+        }
+      }
+    }
+  });
+}
+
+setInterval(cargarDatos, 5000);
+window.onload = cargarDatos;
+</script>
+</head>
+
+<body>
+
+<h2>Ranking en Vivo – Avance de Metas (USD)</h2>
+
+<div class="container">
+  <canvas id="grafico" width="900" height="600"></canvas>
+</div>
+
+</body>
+</html>
