@@ -40,6 +40,7 @@ async function cargarDatos() {
 
   const labels = data.map(d => d.tienda);
   const porcentaje = data.map(d => d.porcentaje.toFixed(1));
+
   const colores = data.map(d => {
     if (d.porcentaje >= 100) return "rgba(0,200,0,0.7)";
     if (d.porcentaje >= 70) return "rgba(250,180,0,0.7)";
@@ -69,19 +70,27 @@ async function cargarDatos() {
         tooltip: {
           bodyFont: { size: 22 },
           titleFont: { size: 22 },
+          padding: 12,
           callbacks: {
-  label: ctx => {
-    const d = data[ctx.dataIndex];
-    return `${d.porcentaje.toFixed(1)}% de la meta`;
-  }
-}
+            title: ctx => {
+              const d = data[ctx[0].dataIndex];
+              return `🏬 ${d.tienda}`;
+            },
+            label: ctx => {
+              const d = data[ctx.dataIndex];
+              return [
+                `• Avance: ${d.porcentaje.toFixed(1)}%`,
+                `• Ventas: $${d.ventas.toLocaleString()}`
+              ];
+            }
+          }
         }
       },
 
       scales: {
         x: {
           beginAtZero: true,
-          max: 120,   // margen para tiendas top
+          max: 120,
           ticks: { font: { size: 20 } }
         },
         y: {
