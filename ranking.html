@@ -35,7 +35,7 @@ async function cargarDatos() {
     porcentaje: (Number(item.ventas) / Number(item.meta)) * 100
   }));
 
-  // ordenar por % meta alcanzada
+  // Ordenar por % de meta alcanzada
   data.sort((a, b) => b.porcentaje - a.porcentaje);
 
   const labels = data.map(d => d.tienda);
@@ -78,10 +78,7 @@ async function cargarDatos() {
             },
             label: ctx => {
               const d = data[ctx.dataIndex];
-              return [
-                `• Avance: ${d.porcentaje.toFixed(1)}%`,
-                `• Ventas: $${d.ventas.toLocaleString()}`
-              ];
+              return `• Avance de meta: ${d.porcentaje.toFixed(1)}%`;
             }
           }
         }
@@ -108,7 +105,7 @@ window.onload = cargarDatos;
 
 <body>
 
-<h2>Ranking en Vivo – Avance de Metas (USD)</h2>
+<h2>Ranking en Vivo – Avance de Metas (%)</h2>
 
 <div class="container">
   <canvas id="grafico" width="900" height="600"></canvas>
